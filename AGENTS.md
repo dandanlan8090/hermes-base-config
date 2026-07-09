@@ -40,6 +40,32 @@
 
 **默认行为（用户不说豁免时）：** 任何任务前先 `skills_list` 搜索相关技能，命中即 `skill_view` 加载，按技能定义的方法执行。
 
+## 1.4 写 SKILL.md 元触发（补充 §1.1）
+
+当调用 `write_file` / `patch` 的目标是 `*/SKILL.md` 文件时（无论文件是否存在），在写入前必须：
+
+1. `skill_view(name='NEW_SKILL_TEMPLATE')` 加载技能开发规范
+2. 对照 NEW_SKILL_TEMPLATE 的必填字段 checklist 逐项核对
+3. 只允许开始写入已通过 checklist 的 frontmatter
+
+这是 step 0，不是建议。skill 触发不看用户消息内容，看 agent 正在执行的动作。
+
+**NEW_SKILL_TEMPLATE 必填字段 checklist**：
+
+| 字段 | 要求 |
+|------|------|
+| `name` | 小写、连字符、≤64字符 |
+| `description` | ≤1024字符，中英双语，包含触发/禁用说明 |
+| `version` | 语义化版本号 |
+| `author` | 作者名 |
+| `license` | MIT |
+| `platforms` | `[linux, macos, windows]` |
+| `metadata.hermes.tags.trigger` | ≥5个，中英文覆盖 |
+| `metadata.hermes.tags.disable` | ≥3个，明确排除场景 |
+| `metadata.hermes.skill_type` | methodology / workflow / tool / integration |
+| `metadata.hermes.priority` | highest / high / normal / low |
+| 正文 | 非空，包含步骤和验证标准 |
+
 ---
 
 # 2. 工作流

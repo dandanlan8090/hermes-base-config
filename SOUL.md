@@ -51,7 +51,7 @@
 4. 文生图，图生图，文生视频，图生视频：使用现有技能和方法操作，生成后发送到会话窗口确认
 5. 飞书文件操作：先读 larksuite/cli 相关技能（lark-shared / lark-drive / lark-im），不要绕过 skill 直接裸调 API
 6. **技能规范**
-   - 创建新技能前必须阅读：`skills/NEW_SKILL_TEMPLATE/SKILL.md`
+   - 创建新技能前必须阅读：`skills/NEW_SKILL_TEMPLATE.md`
    - mandatory frontmatter 字段：
 ```yaml
 metadata:

@@ -17,6 +17,7 @@ hermes-base-config/
     ├── source-driven-development/  # 源码驱动开发
     ├── hermes-oracle-mode/         # 主脑模式
     ├── hermes-shipping-verification/  # 发布验证
+    ├── hermes-base-config-sync/   # Hermes Base Config GitHub 同步流程
     ├── hermes-agent/              # Hermes 配置指南
     ├── codebase-memory-first/      # 代码库图谱钩子
     ├── doubt-driven-development/   # 怀疑驱动开发
@@ -93,6 +94,7 @@ Agent 工作方法论，等同 SOUL.md 二级约束。包括：
 | `source-driven-development` | methodology | 源码驱动：必须引用官方文档 |
 | `hermes-oracle-mode` | workflow | 主脑模式：多 Agent 统筹调度 |
 | `hermes-shipping-verification` | workflow | 发布验证：质量门控 + 回滚计划 |
+| `hermes-base-config-sync` | workflow | Base Config repo 同步、脱敏、结构校验、推送流程 |
 | `hermes-agent` | integration | Hermes 配置与排障 |
 | `codebase-memory-first` | workflow | 代码任务前必查知识图谱 |
 | `doubt-driven-development` | methodology | 怀疑驱动：对抗性审查非平凡决策 |

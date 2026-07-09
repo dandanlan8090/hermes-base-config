@@ -141,6 +141,19 @@ PYTHONPATH="$PWD" python3 -c "from indexer import build_index; build_index(force
 
 详见 `skills/vdb-retrieval-pipeline.md`。
 
+### 持久化（避免每次会话重新配置）
+
+```bash
+# 1. 部署启动脚本（自动预热 Chroma）
+cp scripts/vdb-autoload.py ~/.hermes/scripts/
+chmod +x ~/.hermes/scripts/vdb-autoload.py
+
+# 2. 更新 AGENTS.md 让 agent 优先使用 vdb
+# 仓库的 AGENTS.md §0 已包含 vdb 检索指令
+# 同步后 agent 将用 search() 替代 available_skills 手动匹配
+cp AGENTS.md ~/.hermes/
+```
+
 ## 自定义
 
 ### 创建用户专属 USER.md

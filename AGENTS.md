@@ -6,6 +6,22 @@
 
 ---
 
+# 0. 技能检索方法
+
+技能检索使用 `~/.hermes/vdb/` 的 Chroma + SiliconFlow BGE-M3 混合检索系统。
+
+**禁用 available_skills 手动匹配**。始终用以下方式：
+
+```python
+from matcher import search
+results = search(query)        # 语义 + 关键词混合检索
+top_skill = results[0]          # 取最高分技能
+```
+
+只有当 `search()` 返回空结果或最高分 < 0.3 时，才走备用方案：`skills_list` → `skill_view` 手动扫描。
+
+---
+
 # 1. Skill / 知识加载铁律（核心）
 
 ## 1.1 触发判定

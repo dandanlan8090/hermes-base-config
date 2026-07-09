@@ -75,11 +75,31 @@ for r in results:
 # }, ...]
 ```
 
-### 自动加载
+### 自动加载（持久化）
 
-```python
-# 在 Hermes 初始化脚本中添加：
-from matcher import search  # 此导入即预热 Chroma
+vdb 不会自动替换 Hermes 原生 skill 匹配。需要主动启用：
+
+**推荐：启动脚本**
+
+```bash
+# 将脚本复制到 ~/.hermes/scripts/
+cp scripts/vdb-autoload.py ~/.hermes/scripts/
+chmod +x ~/.hermes/scripts/vdb-autoload.py
+# Hermes 启动时自动执行（需 config.yaml 启用 scripts 自动执行）
+```
+
+若不支持 scripts 自动执行，在 AGENTS.md 开头加：
+
+```markdown
+## 0. 技能检索方法
+
+技能检索使用 ~/.hermes/vdb/ 的 Chroma + SiliconFlow BGE-M3 混合检索。
+禁用 available_skills 手动匹配。始终用以下方式：
+
+    from matcher import search
+    results = search(query)
+
+只有当 search() 返回空时才走备用：skills_list → skill_view。
 ```
 
 ## 模型选择

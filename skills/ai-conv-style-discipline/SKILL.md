@@ -17,6 +17,8 @@ metadata:
       disable:
         - "创意写作"
         - "长文本需求"
+        - "简单问答"
+        - "非对话任务"
     skill_type: "methodology"
     priority: "high"
     related_skills: [ai-conv-style-discipline]

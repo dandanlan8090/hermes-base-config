@@ -19,6 +19,7 @@ metadata:
       disable:
         - "使用 hermes"
         - "普通任务"
+        - "非配置类问题"
     skill_type: "integration"
     priority: "highest"
     related_skills: [hermes-oracle-mode, agent-collaboration-workflow]

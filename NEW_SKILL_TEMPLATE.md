@@ -76,8 +76,8 @@ prerequisites:
 - 具体明确：避免过于宽泛的词（如"工作"、"做"）
 
 **标签在 vdb 语义匹配中的双重作用**：
-1. **向量侧**：tags 经句式模板包装后喂入 BGE-Small-ZH，参与 embedding 生成
-2. **检索后重打分**：raw trigger_tags 从 metadata 取出，用 fuzzywuzzy 计算 query 与 tags 的 partial_ratio 匹配度，加权融合到最终分数（0.6×vec_score + 0.4×tag_match_score）
+1. **稠密向量侧**：tags 拼接在 name+desc 后送入 SiliconFlow BGE-M3（云端 1024d）
+2. **稀疏打分侧**：仅 trigger_tags → 本地纯 Python lexical weights → `compute_lexical_matching_score` 与 query 关键词匹配 → 加权融合（0.6 × dense_cosine + 0.4 × sparse_lexical）
 
 因此 trigger 标签质量直接影响召回：
 - 标签越精准语义匹配越好

@@ -14,6 +14,7 @@ hermes-base-config/
 └── skills/               # 核心技能集
     ├── new-skill-template/         # 技能开发模板
     ├── plan/                       # Plan Mode
+    ├── vdb-retrieval-pipeline      # vdb 技能语义检索管道
     ├── source-driven-development/  # 源码驱动开发
     ├── hermes-oracle-mode/         # 主脑模式
     ├── hermes-shipping-verification/  # 发布验证
@@ -98,7 +99,8 @@ Agent 工作方法论，等同 SOUL.md 二级约束。包括：
 | `hermes-agent` | integration | Hermes 配置与排障 |
 | `codebase-memory-first` | workflow | 代码任务前必查知识图谱 |
 | `doubt-driven-development` | methodology | 怀疑驱动：对抗性审查非平凡决策 |
-| `ai-conv-style-discipline` | methodology | CLI 对话风格规范 |
+|| `ai-conv-style-discipline` | methodology | CLI 对话风格规范 |
+|| `vdb-retrieval-pipeline` | infrastructure | Chroma + SiliconFlow BGE-M3 混合检索管道 |
 
 ## Skill 优先级
 
@@ -106,9 +108,38 @@ Agent 工作方法论，等同 SOUL.md 二级约束。包括：
 highest   → hermes-agent, hermes-oracle-mode, new-skill-template
 high      → plan, source-driven-development, hermes-shipping-verification,
             doubt-driven-development, ai-conv-style-discipline, codebase-memory-first
-normal    → 工具/集成类技能
+normal    → 工具/集成类技能, vdb-retrieval-pipeline
 low       → 辅助/可选技能
 ```
+
+## 技能检索系统（vdb）
+
+Hermes 使用 Chroma + SiliconFlow BAAI/bge-m3 混合检索为技能匹配提供语义支持。
+
+### 推荐：硅基流动 SiliconFlow（免费、低延迟）
+
+```bash
+# 1. 创建虚拟环境
+python3 -m venv ~/.hermes/vdb/.venv
+source ~/.hermes/vdb/.venv/bin/activate
+pip install chromadb openai python-dotenv
+
+# 2. 配置 API Key（免费注册 https://siliconflow.cn）
+echo 'SILICONFLOW_API_KEY=sk-your-key' >> ~/.hermes/.env
+
+# 3. 重建索引
+cd ~/.hermes/vdb
+source .venv/bin/activate
+PYTHONPATH="$PWD" python3 -c "from indexer import build_index; build_index(force=True)"
+```
+
+### 替换模型（可选）
+
+当前默认使用硅基流动 BGE-M3（1024d，~116ms 延迟）。
+
+**换 OpenAI / NVIDIA / 本地模型**：只改 `embed.py` 中 `API_URL` + `MODEL` 两个常量，然后 `build_index(force=True)` 重建。
+
+详见 `skills/vdb-retrieval-pipeline.md`。
 
 ## 自定义
 

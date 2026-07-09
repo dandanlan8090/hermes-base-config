@@ -29,7 +29,7 @@ hermes-base-config/
 
 ```bash
 # 克隆到本地
-git clone https://github.com/dandanlan8090/hermes-base-config.git ~/hermes-base-config
+git clone https://github.com/YOUR_USERNAME/hermes-base-config.git ~/hermes-base-config
 
 # 或使用 rsync 同步到目标机器
 rsync -av ~/hermes-base-config/ ~/.hermes/

@@ -207,9 +207,9 @@ MINOR: 新增功能或标签优化（向后兼容）
 PATCH: 修正 typo、补充说明（不影响行为）
 ---
 📚 参考文档
-技能索引: `productivity/superpowers/SKILL_INDEX.md`
+技能索引: `skills/SKILL_INDEX.md`
 标签系统: 见本文件"标签设计原则"章节
-SOUL.md: `C:\Users\lan\AppData\Local\hermes\SOUL.md` — 人格定义中的技能加载规则
-AGENTS.md: `C:\Users\lan\AppData\Local\hermes\AGENTS.md` — 架构指南
+SOUL.md: `~/.hermes/SOUL.md` — 人格定义中的技能加载规则
+AGENTS.md: `~/.hermes/AGENTS.md` — 架构指南
 ---
 本规范随技能系统演进而更新，每次重大调整都应同步修订此文档。

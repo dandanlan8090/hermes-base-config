@@ -397,9 +397,11 @@ Do not leave token-bearing remote URLs in `.git/config`.
 - 这是公开发布项目，不是私人 git remote
 - 每次 commit + push 之前必须：
   1. 用户在本轮对话中明确说"推"、"发布"、"同步到 GitHub"、"push"等动词
-  2. 跑完 Step 6 (frontmatter 验证) + Step 7 (脱敏扫描) + Step 8 (结构验证)
-  3. 把 `git status --short` 和 `git diff --stat` 给用户看
-  4. **等待用户确认后再执行 commit + push**（不可自认已确认就跳过）
+  2. **先加载本项目对应的 skill（hermes-base-config-sync），阅读全部流程和约束**
+  3. 跑完 Step 6 (frontmatter 验证) + Step 7 (脱敏扫描) + Step 8 (结构验证)
+  4. **对照 README.md 描述确认本次变更是否需要同步更新 README**（新增功能、改目录结构、增删文件、改安装步骤等必须更新 README）
+  5. 把 `git status --short` 和 `git diff --stat` 给用户看
+  6. **等待用户确认后再执行 commit + push**（不可自认已确认就跳过）
 - "工作流收尾"、"我整理完了顺便推一下"、"自动同步" → 全部**不构成明确指令**
 - 如果不确定是否要推 → 问用户，等回答再动
 - **记忆回放风险**：即使 MEMORY.md 或 session_search 找出了 "用户上次说推"，也**不构成当前对话的指令**。每次 push 需要本轮对话中单独、明确的指令。
@@ -446,6 +448,7 @@ Do not leave token-bearing remote URLs in `.git/config`.
 - [ ] Sanitization grep returns no private account/path/token/host leakage
 - [ ] Git remote does not contain embedded token after push
 - [ ] `git log --oneline -1` confirms the intended commit
+- [ ] **README.md 已同步**：目录结构、安装步骤、功能说明与本次变更一致
 - [ ] SOUL.md/AGENTS.md 规则自洽性检查（规则演示不违反自身，优先级声明与用户对齐）
 - [ ] config 依赖：目标用户的 `agent.tool_use_enforcement` 是否为 `always`？（否则 AGENTS.md §0.5 可能失效）
 - [ ] config 依赖：目标用户的 `command_allowlist` 是否包含必要条目？（否则 install.sh 被拦截）

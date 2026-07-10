@@ -40,9 +40,12 @@ pip install chromadb openai python-dotenv
 SiliconFlow 提供免费额度（2000 RPM / 500k TPM），注册获取 key：
 
 ```bash
-cp vdb/.env.example ~/.hermes/vdb/.env
-# 编辑 ~/.hermes/vdb/.env 填入你的 Key
+# install.sh 会自动复制，也可以手动操作：
+cp .env.example ~/.hermes/.env
+# 编辑 ~/.hermes/.env，填入你的 Key
 ```
+
+vdb 的 `embed.py` 从 `~/.hermes/.env` 自动读取 `SILICONFLOW_API_KEY`。
 
 ### 4. 重建索引
 
@@ -168,9 +171,10 @@ MODEL = "text-embedding-ada-002"    # 1536d
 ├── indexer.py         # Chroma 索引构建
 ├── matcher.py         # 检索入口 search()
 ├── __init__.py        # 包入口
-├── .env               # API Key 配置（从 .env.example 复制后编辑）
 ├── .venv/             # 隔离 Python 环境（init-vdb.sh 自动创建）
 └── chroma/            # 持久化向量存储 ~1.2MB（build_index 自动创建）
+
+# API Key 在 ~/.hermes/.env（由 install.sh 或手动从 .env.example 复制）
 ```
 
 ## 性能

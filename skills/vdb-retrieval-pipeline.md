@@ -21,7 +21,13 @@ query
 
 ## 安装
 
-### 1. 创建虚拟环境
+### 1. 从 repo 复制代码
+
+```bash
+cp -r vdb/ ~/.hermes/vdb/
+```
+
+### 2. 创建虚拟环境
 
 ```bash
 python3 -m venv ~/.hermes/vdb/.venv
@@ -29,19 +35,13 @@ source ~/.hermes/vdb/.venv/bin/activate
 pip install chromadb openai python-dotenv
 ```
 
-### 2. 配置 API Key
+### 3. 配置 API Key
 
 SiliconFlow 提供免费额度（2000 RPM / 500k TPM），注册获取 key：
 
 ```bash
-echo 'SILICONFLOW_API_KEY=sk-your-key-here' >> ~/.hermes/.env
-```
-
-### 3. 拷贝代码
-
-```bash
-# 仓库已包含
-cp -r skills/vdb-retrieval-pipeline ~/.hermes/skills/infrastructure/
+cp vdb/.env.example ~/.hermes/vdb/.env
+# 编辑 ~/.hermes/vdb/.env 填入你的 Key
 ```
 
 ### 4. 重建索引
@@ -160,15 +160,17 @@ MODEL = "text-embedding-ada-002"    # 1536d
 
 ## 文件结构
 
-```
+```text
+# 从 repo 复制后的 vdb 目录：
 ~/.hermes/vdb/
 ├── sparse.py          # 纯 Python lexical weights（无依赖）
 ├── embed.py           # 云端稠密 API + 本地 sparse 接口
 ├── indexer.py         # Chroma 索引构建
 ├── matcher.py         # 检索入口 search()
 ├── __init__.py        # 包入口
-├── .venv/             # 隔离 Python 环境
-└── chroma/            # 持久化向量存储（~1.2MB）
+├── .env               # API Key 配置（从 .env.example 复制后编辑）
+├── .venv/             # 隔离 Python 环境（init-vdb.sh 自动创建）
+└── chroma/            # 持久化向量存储 ~1.2MB（build_index 自动创建）
 ```
 
 ## 性能

@@ -11,6 +11,15 @@ hermes-base-config/
 ├── SOUL.md              # Agent 核心身份与工作原则
 ├── AGENTS.md            # Agent 工作方法论
 ├── USER.md              # 用户画像模板（通用版）
+├── scripts/
+│   └── init-vdb.sh      # vdb 环境一键初始化脚本
+├── vdb/                  # 技能检索系统（vdb 运行时工具链）
+│   ├── sparse.py         # 中文/英文 token 分词 + lexical weight
+│   ├── embed.py          # 云端 Embedding API 包装
+│   ├── indexer.py        # Chroma 索引构建
+│   ├── matcher.py        # 检索入口 search()
+│   ├── __init__.py       # 包入口
+│   └── .env.example      # API Key 配置模板
 └── skills/               # 核心技能集
     ├── new-skill-template/         # 技能开发模板
     ├── plan/                       # Plan Mode
@@ -52,6 +61,9 @@ cp USER.md ~/.hermes/memories/USER.md
 ```bash
 # 将 skills/ 目录内容复制到 ~/.hermes/skills/
 rsync -av skills/ ~/.hermes/skills/
+
+# 4. 安装 vdb 技能检索（可选但推荐）
+# 详见下方 §技能检索系统
 ```
 
 ## 文件说明
@@ -115,19 +127,34 @@ low       → 辅助/可选技能
 ## 技能检索系统（vdb）
 
 Hermes 使用 Chroma + SiliconFlow BAAI/bge-m3 混合检索为技能匹配提供语义支持。
+vdb 工具链已包含在本仓库 `vdb/` 目录中。
 
-### 推荐：硅基流动 SiliconFlow（免费、低延迟）
+### 安装（一键脚本）
 
 ```bash
-# 1. 创建虚拟环境
+# 1. 从 repo 复制 vdb 工具链
+cp -r vdb/ ~/.hermes/vdb/
+
+# 2. 运行初始化脚本（创建 .venv + 配置 API Key + 重建索引）
+bash scripts/init-vdb.sh
+```
+
+### 手动安装
+
+```bash
+# 1. 复制工具链
+cp -r vdb/ ~/.hermes/vdb/
+
+# 2. 创建虚拟环境
 python3 -m venv ~/.hermes/vdb/.venv
 source ~/.hermes/vdb/.venv/bin/activate
 pip install chromadb openai python-dotenv
 
-# 2. 配置 API Key（免费注册 https://siliconflow.cn）
-echo 'SILICONFLOW_API_KEY=sk-your-key' >> ~/.hermes/.env
+# 3. 配置 API Key（免费注册 https://siliconflow.cn）
+cp vdb/.env.example ~/.hermes/vdb/.env
+# 编辑 ~/.hermes/vdb/.env，填入你的 SILICONFLOW_API_KEY
 
-# 3. 重建索引
+# 4. 重建索引
 cd ~/.hermes/vdb
 source .venv/bin/activate
 PYTHONPATH="$PWD" python3 -c "from indexer import build_index; build_index(force=True)"
@@ -137,22 +164,20 @@ PYTHONPATH="$PWD" python3 -c "from indexer import build_index; build_index(force
 
 当前默认使用硅基流动 BGE-M3（1024d，~116ms 延迟）。
 
-**换 OpenAI / NVIDIA / 本地模型**：只改 `embed.py` 中 `API_URL` + `MODEL` 两个常量，然后 `build_index(force=True)` 重建。
+**换 OpenAI / NVIDIA / 本地模型**：只改 `vdb/embed.py` 中 `API_URL` + `MODEL` 两个常量，然后 `build_index(force=True)` 重建。
 
 详见 `skills/vdb-retrieval-pipeline.md`。
 
 ### 持久化（避免每次会话重新配置）
 
 ```bash
-# 1. 部署启动脚本（自动预热 Chroma）
-cp scripts/vdb-autoload.py ~/.hermes/scripts/
-chmod +x ~/.hermes/scripts/vdb-autoload.py
-
-# 2. 更新 AGENTS.md 让 agent 优先使用 vdb
+# 1. 更新 AGENTS.md 让 agent 优先使用 vdb
 # 仓库的 AGENTS.md §0 已包含 vdb 检索指令
-# 同步后 agent 将用 search() 替代 available_skills 手动匹配
 cp AGENTS.md ~/.hermes/
 ```
+
+注意：chroma/（向量存储）和 .venv/（虚拟环境）是本地生成文件，不在仓库中。
+首次安装后运行 `build_index(force=True)` 自动创建这两个目录。
 
 ## 自定义
 

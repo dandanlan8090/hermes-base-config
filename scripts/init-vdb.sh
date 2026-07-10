@@ -4,19 +4,34 @@
 # 用法:
 #   bash scripts/init-vdb.sh            复制 vdb/.env.example → ~/.hermes/.env（如果不存在）
 #   bash scripts/init-vdb.sh --skip-env 跳过 .env 处理（安装脚本已处理）
+#   bash scripts/init-vdb.sh --profile work  重建指定 profile 的技能索引
 #
 # 独立运行（如果 vdb/ 已经复制到 ~/.hermes/vdb/）：
 #   bash ~/.hermes/scripts/init-vdb.sh
+#   bash ~/.hermes/scripts/init-vdb.sh --profile work
 
 set -euo pipefail
 
 VDB_DST="${HOME}/.hermes/vdb"
 HERMES_DIR="${HOME}/.hermes"
 SKIP_ENV=false
+PROFILE=""
 
-for arg in "$@"; do
-    [ "$arg" = "--skip-env" ] && SKIP_ENV=true
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --skip-env) SKIP_ENV=true ;;
+        --profile) PROFILE="${2:-}"; [ -n "$PROFILE" ] || { echo "--profile 需要参数"; exit 2; }; shift ;;
+        --profile=*) PROFILE="${1#*=}" ;;
+        *) echo "未知参数: $1"; exit 2 ;;
+    esac
+    shift
 done
+
+if [ -n "$PROFILE" ]; then
+    export HERMES_SKILL_DIR="${HOME}/.hermes/profiles/${PROFILE}/skills"
+    echo "==> profile: $PROFILE"
+    echo "    技能目录: $HERMES_SKILL_DIR"
+fi
 
 echo "==> 1. 检查 vdb 工具链"
 if [ ! -f "${VDB_DST}/sparse.py" ]; then

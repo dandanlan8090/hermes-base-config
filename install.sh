@@ -32,7 +32,7 @@ while [ $# -gt 0 ]; do
     case "$1" in
         --force) FORCE=true ;;
         --dry)   DRY=true ;;
-        --profile) PROFILE="$2"; shift ;;
+        --profile) PROFILE="${2:-}"; [ -n "$PROFILE" ] || { echo "--profile 需要参数"; exit 2; }; shift ;;
         --profile=*) PROFILE="${1#*=}" ;;
     esac
     shift
@@ -42,8 +42,9 @@ done
 if [ -n "$PROFILE" ]; then
     HERMES_DIR="${HOME}/.hermes/profiles/${PROFILE}"
     echo "  [profile] 目标: $HERMES_DIR"
-    # 导出 SKILLS_DIR 环境变量让 vdb 索引扫 profile 的技能目录
+    # 导出 HERMES_SKILL_DIR 让本次 vdb 索引扫 profile 的技能目录
     export HERMES_SKILL_DIR="${HERMES_DIR}/skills"
+    echo "  [profile] 已设 HERMES_SKILL_DIR=$HERMES_SKILL_DIR"
 elif command -v hermes &>/dev/null; then
     ACTIVE_PROFILE=$(hermes profile list 2>/dev/null | grep '◆' | awk '{print $2}' | head -1)
     if [ -n "$ACTIVE_PROFILE" ] && [ "$ACTIVE_PROFILE" != "default" ]; then
@@ -180,11 +181,20 @@ echo "── 第 6 步: vdb 环境初始化 ――――――――――――
 if $DRY; then
     echo "  [DRY] 跳过环境初始化"
 elif $IS_NEW || $FORCE; then
-    echo "  运行: bash $HERMES_DIR/scripts/init-vdb.sh"
-    bash "$HERMES_DIR/scripts/init-vdb.sh"
+    if [ -n "$PROFILE" ]; then
+        echo "  运行: bash $HERMES_DIR/scripts/init-vdb.sh --profile $PROFILE"
+        bash "$HERMES_DIR/scripts/init-vdb.sh" --profile "$PROFILE"
+    else
+        echo "  运行: bash $HERMES_DIR/scripts/init-vdb.sh"
+        bash "$HERMES_DIR/scripts/init-vdb.sh"
+    fi
 else
     echo "  检测到已有 ~/.hermes/vdb/.venv，跳过"
-    echo "  如需重建: bash $HERMES_DIR/scripts/init-vdb.sh"
+    if [ -n "$PROFILE" ]; then
+        echo "  如需重建: bash $HERMES_DIR/scripts/init-vdb.sh --profile $PROFILE"
+    else
+        echo "  如需重建: bash $HERMES_DIR/scripts/init-vdb.sh"
+    fi
 fi
 echo ""
 
@@ -219,8 +229,9 @@ else
         echo " 多 profile 用户:"
         if [ -n "$PROFILE" ]; then
             echo "   已安装到 profile $PROFILE，vdb 自动扫描 $HERMES_SKILL_DIR"
+            echo "   后续重建索引：bash $HERMES_DIR/scripts/init-vdb.sh --profile $PROFILE"
         else
-            echo "   默认 vdb 扫描 ~/.hermes/skills/，你的技能在 profile 下则："
+            echo "   默认 vdb 扫描 ~/.hermes/skills/，profile 用户更多支持："
             echo "   bash install.sh --profile <name>   # 安装到指定 profile"
             echo "   或设置环境变量："
             echo "   export HERMES_SKILL_DIR=~/.hermes/profiles/<name>/skills"

@@ -425,7 +425,7 @@ Do not leave token-bearing remote URLs in `.git/config`.
 
 10. **AGENTS.md §10.3 优先级声明可能过时。** AGENTS.md 写 USER.md > AGENTS.md > SOUL.md，但用户优先级链是 SOUL.md > AGENTS.md > USER.md。发布前须与用户确认当前优先级，必要时修正 AGENTS.md。
 
-11. **Profile 路径差异。** 如果你或用户使用 Hermes 多 profile（`~/.hermes/profiles/<name>/`），技能目录是 `profiles/<name>/skills/` 而非 `skills/`。vdb 的 `indexer.py` 默认只扫 `~/.hermes/skills/`，profile 用户的技能索引不到。发布前确认目标用户的 profile 情况，必要时在 README 或技能文档中注明符号链接方案。
+11. **Profile 路径差异。** 如果你或用户使用 Hermes 多 profile（`~/.hermes/profiles/<name>/`），技能目录是 `profiles/<name>/skills/` 而非 `skills/`。vdb 的 `indexer.py` 现在会读取 `HERMES_HOME` 环境变量（profile 会话自动设置），profile 用户的技能目录自动正确索引。也支持 `HERMES_SKILL_DIR` 环境变量覆盖。`install.sh --profile <name>` 会自动传 `HERMES_SKILL_DIR` 给索引步骤。发布前确认 repo 的 README 有 `HERMES_HOME` 路径说明。
 
 12. **把 config.yaml 纳入 repo 范围。** config.yaml 是用户的环境配置（provider 端点、API 密钥、超时、安全白名单、显示偏好），不是项目文件。`agent.tool_use_enforcement` 和 `command_allowlist` 属于用户授权范围，repo 不管理、不承诺、不兜底。`install.sh` 不写 config.yaml，不要求用户改任何设置。详见 `references/config-dependencies.md`。
 
@@ -446,6 +446,7 @@ Do not leave token-bearing remote URLs in `.git/config`.
 - [ ] `git log --oneline -1` confirms the intended commit
 - [ ] **README.md 已同步**：目录结构、安装步骤、功能说明与本次变更一致
 - [ ] **profile 安全**：install.sh 有 `--profile` 参数支持和 profile 检测告警，README 和 SOUL.md 有 profile 路径说明
+- [ ] **profile 路径**：`indexer.py` 读取 `HERMES_HOME` 环境变量（profile 会话自动设），无需持久化标记文件；`HERMES_SKILL_DIR` 可覆盖
 - [ ] SOUL.md/AGENTS.md 规则自洽性检查（规则演示不违反自身，优先级声明与用户对齐）
 - [ ] config 依赖：目标用户的 `agent.tool_use_enforcement` 是否为 `always`？（否则 AGENTS.md §0.5 可能失效）
 - [ ] config 依赖：目标用户的 `command_allowlist` 是否包含必要条目？（否则 install.sh 被拦截）

@@ -39,18 +39,10 @@ hermes profile list   # ◆ 标记当前活跃 profile
 安装路径有所不同：
 - `SOUL.md` / `AGENTS.md` → 每个 profile 独立，分别复制到 `~/.hermes/profiles/<name>/`
 - `skills/` → 每个 profile 可能有自己的技能集，需按需同步
-- `vdb/` 工具链 → 全局共享 `~/.hermes/vdb/`，但索引默认只扫 `~/.hermes/skills/`。
-  如果技能在 `~/.hermes/profiles/<name>/skills/` 下，**二选一**：
-  ```bash
-  # 方案 A：用 --profile 参数安装（推荐，自动处理路径和环境变量）
-  bash install.sh --profile <name>
-
-  # 方案 B（安装后手动配置）：设置环境变量
-  export HERMES_SKILL_DIR=~/.hermes/profiles/<name>/skills
-
-  # 方案 C（安装后手动配置）：建符号链接
-  ln -sf ~/.hermes/profiles/<name>/skills ~/.hermes/skills
-  ```
+- `vdb/` 工具链 → 全局共享 `~/.hermes/vdb/`，技能目录自动跟随当前 profile 会话：
+  - profile 会话（`hermes -p work chat`）自动设 `HERMES_HOME` → `indexer.py` 读 `$HERMES_HOME/skills`
+  - default 会话（`hermes chat`）无 `HERMES_HOME` → 默认 `~/.hermes/skills/`
+  - 环境变量 `HERMES_SKILL_DIR` 可临时覆盖（最高优先级）
 - `.env` → 全局共享 `~/.hermes/.env`，不受 profile 影响
 
 ---

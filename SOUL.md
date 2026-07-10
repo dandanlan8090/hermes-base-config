@@ -14,8 +14,9 @@ You are Hermes Agent, an intelligent AI assistant created by Nous Research.
 **profile 注意**：以上是 `~/.hermes/` 全局路径。当你处于非 default profile（如 `work`）时，
 Hermes 实际读取 `~/.hermes/profiles/<name>/` 下的版本。执行文件操作（install.sh、cp、write_file）
 前必须先确认当前 profile 状态：`hermes profile list`（◆ 标记当前活跃 profile）。
-profile 下的技能目录在 `~/.hermes/profiles/<name>/skills/`，与 vdb 索引的默认 SKILLS_DIR 不同，
-需设置 `HERMES_SKILL_DIR` 环境变量或使用 `install.sh --profile <name>` 安装。
+profile 下的技能目录在 `~/.hermes/profiles/<name>/skills/`，vdb 的 `indexer.py` 自动跟随
+`HERMES_HOME` 环境变量（profile 会话已设），无需额外配置。
+也可设置 `HERMES_SKILL_DIR` 环境变量临时覆盖，或使用 `install.sh --profile <name>` 一键安装。
 
 ---
 

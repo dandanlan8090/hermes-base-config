@@ -22,9 +22,22 @@ from chromadb.config import Settings
 from embed import get_cloud_dense, get_tag_sparse_dict
 
 
-HERMES_HOME = Path.home() / ".hermes"
+def _get_hermes_home() -> Path:
+    """Return the effective Hermes home, reading HERMES_HOME env var first.
+
+    Hermes sets HERMES_HOME when running under a named profile
+    (e.g. ``/home/user/.hermes/profiles/work/``).  When unset, fall
+    back to the default ``~/.hermes``.
+    """
+    val = os.environ.get("HERMES_HOME", "").strip()
+    if val:
+        return Path(val).expanduser()
+    return Path.home() / ".hermes"
+
+
+HERMES_HOME = _get_hermes_home()
 SKILLS_DIR = Path(os.environ.get("HERMES_SKILL_DIR", str(HERMES_HOME / "skills")))
-VDB_DIR = HERMES_HOME / "vdb"
+VDB_DIR = Path.home() / ".hermes" / "vdb"
 CHROMA_DIR = VDB_DIR / "chroma"
 
 COLLECTION_NAME = "skills"

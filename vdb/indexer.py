@@ -23,7 +23,7 @@ from embed import get_cloud_dense, get_tag_sparse_dict
 
 
 HERMES_HOME = Path.home() / ".hermes"
-SKILLS_DIR = HERMES_HOME / "skills"
+SKILLS_DIR = Path(os.environ.get("HERMES_SKILL_DIR", str(HERMES_HOME / "skills")))
 VDB_DIR = HERMES_HOME / "vdb"
 CHROMA_DIR = VDB_DIR / "chroma"
 

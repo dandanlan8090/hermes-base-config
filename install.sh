@@ -159,6 +159,21 @@ else
 fi
 echo ""
 
+# ── 7. vdb 预热 + 索引检测 ──────────────────────────────────────────
+echo "── 第 7 步: vdb 预热 + 索引检测 ―――――――――――――――――――――――――――"
+if $DRY; then
+    echo "  [DRY] 跳过 vdb 预热"
+else
+    PYTHON=""
+    if [ -d "$HERMES_DIR/vdb/.venv" ]; then
+        PYTHON="$HERMES_DIR/vdb/.venv/bin/python3"
+    else
+        PYTHON="python3"
+    fi
+    PYTHONPATH="$HERMES_DIR/vdb" "$PYTHON" "$HERMES_DIR/scripts/vdb-autoload.py" --force 2>&1 || true
+fi
+echo ""
+
 # ── 完成 ────────────────────────────────────────────────────────────
 echo "=========================================="
 if $DRY; then
@@ -171,6 +186,10 @@ else
         echo "   1. 编辑 $HERMES_DIR/.env 填入 API Key"
         echo "   2. 重启 Hermes 会话"
         echo "   3. 运行 'hermes chat' 验证 vdb 自动加载"
+        echo ""
+        echo " 多 profile 用户:"
+        echo "   默认 vdb 扫描 ~/.hermes/skills/，你的技能在 profile 下则："
+        echo "   export HERMES_SKILL_DIR=~/.hermes/profiles/<name>/skills"
     else
         echo "   1. 手动合并 SOUL.md / AGENTS.md（见上方提示）"
         echo "   2. 重启 Hermes 会话"

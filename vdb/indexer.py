@@ -238,8 +238,66 @@ def build_index(force: bool = False):
     count = collection.count()
     print(f"[indexer] Chroma 写入完成: {count} 个技能, dim={len(dense_vecs[0])}")
 
+    # ── v2.1: 写状态文件（供健康检查检测索引过期） ─────────────────
+    VDB_DIR.mkdir(parents=True, exist_ok=True)
+    state = {
+        "count": count,
+        "dim": len(dense_vecs[0]),
+        "skill_hashes": {s[0]: _file_hash(Path(s[1])) for s in skills},
+        "built_at": __import__("datetime").datetime.now().isoformat(),
+    }
+    state_path = VDB_DIR / "vdb_state.json"
+    state_path.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"[indexer] 状态文件已保存: {state_path}")
 
-# ── CLI ────────────────────────────────────────────────────────────
+
+# ── 状态文件（健康检查） ─────────────────────────────────────────────
+
+STATE_FILE = VDB_DIR / "vdb_state.json"
+
+
+def check_index_stale() -> tuple[bool, str]:
+    """检查索引是否过期（对比技能目录最新 hash vs 状态文件）。
+
+    返回:
+        (is_stale: bool, reason: str)
+    """
+    if not STATE_FILE.exists():
+        return True, "状态文件不存在（从未构建或手动删除）"
+    try:
+        state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        return True, "状态文件损坏"
+
+    # 扫描当前技能
+    current = {}
+    for path in sorted(SKILLS_DIR.rglob("SKILL.md")):
+        rel = path.as_posix()
+        if ".venv" in rel or "/.archive/" in rel:
+            continue
+        fm = _load_frontmatter(path)
+        name = fm.get("name", path.parent.name) if fm else path.parent.name
+        current[name] = _file_hash(path)
+
+    saved = state.get("skill_hashes", {})
+
+    # 检查技能增减
+    added = set(current) - set(saved)
+    removed = set(saved) - set(current)
+    if added:
+        return True, f"新增技能: {', '.join(sorted(added)[:5])}"
+    if removed:
+        return True, f"删除技能: {', '.join(sorted(removed)[:5])}"
+
+    # 检查已修改
+    changed = [n for n in current if n in saved and current[n] != saved[n]]
+    if changed:
+        return True, f"技能已修改: {', '.join(changed[:5])}"
+
+    return False, ""
+
+
+# ── CLI ─────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
     build_index(force="--force" in __import__("sys").argv)

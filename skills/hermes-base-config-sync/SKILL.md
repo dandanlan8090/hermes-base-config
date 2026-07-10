@@ -41,16 +41,9 @@ prerequisites:
   commands:
   - git
   - gh
-  config:
-    "agent.tool_use_enforcement": "always"
-    reason: >-
-      仓库 AGENTS.md §0.5 写 "禁用 available_skills 手动匹配。始终用
-      from matcher import search"。tool_use_enforcement: always 确保
-      此指令在所有模型上生效（auto 仅对 GPT/Codex 生效）。
-    "command_allowlist": "必须包含 11 条默认 allowlist"
-    reason: >-
-      install.sh 和 init-vdb.sh 用到 cp、ln、git push、heredoc 等操作，
-      缺少 allowlist 会被 Hermes 安全框架拦截。
+  config: {}
+  # NOTE: config.yaml is user-authorization scope, not project-managed.
+  # See references/config-dependencies.md for the full dependency analysis.
 ---
 # Hermes Base Config GitHub Sync
 
@@ -137,6 +130,7 @@ hermes-base-config/
 Use these local source paths only for reading. Do not publish them without sanitization.
 
 参见 `references/config-dependencies.md`：repo 对 Hermes 配置项的依赖关系清单。
+参见 `references/session-2026-07-10-review.md`：2026-07-10 用户审查归档（8 点评设计原则 + 已知风险点）。
 
 ```text
 ~/.hermes/SOUL.md
@@ -433,6 +427,8 @@ Do not leave token-bearing remote URLs in `.git/config`.
 
 11. **Profile 路径差异。** 如果你或用户使用 Hermes 多 profile（`~/.hermes/profiles/<name>/`），技能目录是 `profiles/<name>/skills/` 而非 `skills/`。vdb 的 `indexer.py` 默认只扫 `~/.hermes/skills/`，profile 用户的技能索引不到。发布前确认目标用户的 profile 情况，必要时在 README 或技能文档中注明符号链接方案。
 
+12. **把 config.yaml 纳入 repo 范围。** config.yaml 是用户的环境配置（provider 端点、API 密钥、超时、安全白名单、显示偏好），不是项目文件。`agent.tool_use_enforcement` 和 `command_allowlist` 属于用户授权范围，repo 不管理、不承诺、不兜底。`install.sh` 不写 config.yaml，不要求用户改任何设置。详见 `references/config-dependencies.md`。
+
 ---
 
 ## Verification Checklist
@@ -449,6 +445,7 @@ Do not leave token-bearing remote URLs in `.git/config`.
 - [ ] Git remote does not contain embedded token after push
 - [ ] `git log --oneline -1` confirms the intended commit
 - [ ] **README.md 已同步**：目录结构、安装步骤、功能说明与本次变更一致
+- [ ] **profile 安全**：install.sh 有 `--profile` 参数支持和 profile 检测告警，README 和 SOUL.md 有 profile 路径说明
 - [ ] SOUL.md/AGENTS.md 规则自洽性检查（规则演示不违反自身，优先级声明与用户对齐）
 - [ ] config 依赖：目标用户的 `agent.tool_use_enforcement` 是否为 `always`？（否则 AGENTS.md §0.5 可能失效）
 - [ ] config 依赖：目标用户的 `command_allowlist` 是否包含必要条目？（否则 install.sh 被拦截）

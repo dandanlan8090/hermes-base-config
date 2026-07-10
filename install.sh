@@ -2,9 +2,15 @@
 # Hermes Base Config 安装脚本
 #
 # 用法:
-#   bash install.sh             自动检测新装/存量
-#   bash install.sh --force     强制全量覆盖（新装机）
-#   bash install.sh --dry       预览变更不执行
+#   bash install.sh                    自动检测新装/存量
+#   bash install.sh --force            强制全量覆盖（新装机）
+#   bash install.sh --dry              预览变更不执行
+#   bash install.sh --profile <name>   安装到指定 profile（如 --profile work）
+#
+# ⚠ profile 安全：
+#   如果你在 profile 会话中运行 install.sh，默认会装到 ~/.hermes/（全局），
+#   而不是你当前 profile 的目录 ~/.hermes/profiles/<name>/。
+#   Hermes 对自身所处目录感知弱，请务必用 --profile 参数指定目标。
 #
 # 重点文件说明:
 #   SOUL.md, AGENTS.md, memories/USER.md
@@ -19,14 +25,37 @@ HERMES_DIR="${HOME}/.hermes"
 IS_NEW=false
 FORCE=false
 DRY=false
+PROFILE=""
 
 # ── 参数 ────────────────────────────────────────────────────────────
-for arg in "$@"; do
-    case "$arg" in
+while [ $# -gt 0 ]; do
+    case "$1" in
         --force) FORCE=true ;;
         --dry)   DRY=true ;;
+        --profile) PROFILE="$2"; shift ;;
+        --profile=*) PROFILE="${1#*=}" ;;
     esac
+    shift
 done
+
+# ── Profile 检测 ────────────────────────────────────────────────────
+if [ -n "$PROFILE" ]; then
+    HERMES_DIR="${HOME}/.hermes/profiles/${PROFILE}"
+    echo "  [profile] 目标: $HERMES_DIR"
+    # 导出 SKILLS_DIR 环境变量让 vdb 索引扫 profile 的技能目录
+    export HERMES_SKILL_DIR="${HERMES_DIR}/skills"
+elif command -v hermes &>/dev/null; then
+    ACTIVE_PROFILE=$(hermes profile list 2>/dev/null | grep '◆' | awk '{print $2}' | head -1)
+    if [ -n "$ACTIVE_PROFILE" ] && [ "$ACTIVE_PROFILE" != "default" ]; then
+        echo "=========================================="
+        echo " ⚠ 检测到当前活跃 profile: $ACTIVE_PROFILE"
+        echo " ⚠ 当前目标目录是 ~/.hermes/（全局），不是 $ACTIVE_PROFILE 的目录"
+        echo " ⚠ 如果要安装到 $ACTIVE_PROFILE，请用:"
+        echo "    bash install.sh --profile $ACTIVE_PROFILE"
+        echo "=========================================="
+        echo ""
+    fi
+fi
 
 if [ ! -d "$HERMES_DIR" ]; then
     IS_NEW=true
@@ -188,8 +217,14 @@ else
         echo "   3. 运行 'hermes chat' 验证 vdb 自动加载"
         echo ""
         echo " 多 profile 用户:"
-        echo "   默认 vdb 扫描 ~/.hermes/skills/，你的技能在 profile 下则："
-        echo "   export HERMES_SKILL_DIR=~/.hermes/profiles/<name>/skills"
+        if [ -n "$PROFILE" ]; then
+            echo "   已安装到 profile $PROFILE，vdb 自动扫描 $HERMES_SKILL_DIR"
+        else
+            echo "   默认 vdb 扫描 ~/.hermes/skills/，你的技能在 profile 下则："
+            echo "   bash install.sh --profile <name>   # 安装到指定 profile"
+            echo "   或设置环境变量："
+            echo "   export HERMES_SKILL_DIR=~/.hermes/profiles/<name>/skills"
+        fi
     else
         echo "   1. 手动合并 SOUL.md / AGENTS.md（见上方提示）"
         echo "   2. 重启 Hermes 会话"

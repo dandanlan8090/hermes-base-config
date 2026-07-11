@@ -1,3 +1,15 @@
+> # ⚠️ 本仓库已归档 (ARCHIVED)
+>
+> **本项目已被 [hermes-micro-framework](https://github.com/dandanlan8090/hermes-micro-framework) 取代，不再维护。**
+>
+> 新仓库是微内核重构版：SOUL.md 极致拆解为铁律 + 路由表，62 个技能按分类组织，vdb 语义检索按需加载（RRF 融合，正式集 Top-1 88.3%）。旧版的 `AGENTS.md` 已废弃，全部方法论已拆入独立 skill。
+>
+> 👉 **请前往新仓库：https://github.com/dandanlan8090/hermes-micro-framework**
+>
+> 以下内容仅作历史归档保留。
+
+---
+
 # Hermes Base Config
 
 # Hermes Agent 通用配置模板仓库。包含核心配置文件、技能集和 vdb 技能检索工具链。
